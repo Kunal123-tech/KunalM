@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BudCart — Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0f; --surface: #111118; --surface2: #18181f;
+      --border: #2a2a38; --accent: #7c5cfc; --accent2: #fc5c7d;
+      --text: #e8e8f0; --muted: #7a7a9a; --white: #ffffff;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg); color: var(--text);
+      font-family: 'DM Sans', sans-serif; min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; padding: 24px;
+    }
+    body::before {
+      content: ''; position: fixed; top: -100px; right: -100px;
+      width: 500px; height: 500px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(124,92,252,.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    body::after {
+      content: ''; position: fixed; bottom: -80px; left: -80px;
+      width: 400px; height: 400px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(252,92,125,.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .logo {
+      font-family: 'Bebas Neue', cursive; font-size: 32px; letter-spacing: 3px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; text-decoration: none;
+      display: block; text-align: center; margin-bottom: 8px;
+    }
+    .tagline { text-align: center; color: var(--muted); font-size: 13px; margin-bottom: 32px; }
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 36px 40px;
+      width: 100%; max-width: 420px; position: relative; z-index: 1;
+    }
+    .card h2 {
+      font-family: 'Bebas Neue', cursive; font-size: 26px;
+      letter-spacing: 1px; color: var(--white); margin-bottom: 6px;
+    }
+    .card .sub { color: var(--muted); font-size: 13px; margin-bottom: 28px; }
+    .field { margin-bottom: 18px; }
+    .field label { display: block; font-size: 13px; font-weight: 500; color: var(--muted); margin-bottom: 6px; }
+    .field input {
+      width: 100%; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 10px 14px; color: var(--text);
+      font-family: inherit; font-size: 14px; outline: none; transition: border-color .2s;
+    }
+    .field input:focus { border-color: var(--accent); }
+    .field input::placeholder { color: #4a4a6a; }
+    .btn-primary {
+      width: 100%; background: linear-gradient(135deg, var(--accent), #5a3cd4);
+      color: #fff; border: none; padding: 12px; border-radius: 8px;
+      font-family: inherit; font-size: 15px; font-weight: 600; cursor: pointer;
+      margin-top: 8px; transition: opacity .2s, transform .15s, box-shadow .2s;
+    }
+    .btn-primary:hover { opacity: .9; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(124,92,252,.35); }
+    .btn-secondary {
+      width: 100%; background: var(--surface2); color: var(--text);
+      border: 1px solid var(--border); padding: 12px; border-radius: 8px;
+      font-family: inherit; font-size: 15px; font-weight: 600; cursor: pointer;
+      margin-top: 10px; transition: background .2s;
+    }
+    .btn-secondary:hover { background: var(--border); }
+    .btn-danger {
+      width: 100%; background: linear-gradient(135deg, #e5404a, #b52d35);
+      color: #fff; border: none; padding: 12px; border-radius: 8px;
+      font-family: inherit; font-size: 15px; font-weight: 600; cursor: pointer;
+      margin-top: 8px; transition: opacity .2s, transform .15s;
+    }
+    .btn-danger:hover { opacity: .9; transform: translateY(-1px); }
+    .divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; }
+    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .divider span { color: var(--muted); font-size: 12px; }
+    .footer-link { text-align: center; margin-top: 20px; font-size: 13px; color: var(--muted); }
+    .footer-link a { color: var(--accent); text-decoration: none; font-weight: 500; }
+    .footer-link a:hover { text-decoration: underline; }
+    .error-msg {
+      background: rgba(229,64,74,.1); border: 1px solid rgba(229,64,74,.3);
+      color: #f08088; border-radius: 8px; padding: 10px 14px;
+      font-size: 13px; margin-bottom: 16px; display: none;
+    }
+    #toast {
+      position: fixed; bottom: 28px; right: 28px;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-left: 3px solid var(--accent); color: var(--text);
+      padding: 14px 20px; border-radius: 8px; font-size: 14px; z-index: 999;
+      transform: translateY(80px); opacity: 0;
+      transition: all .35s cubic-bezier(.22,1,.36,1); pointer-events: none;
+    }
+    #toast.show { transform: translateY(0); opacity: 1; }
+</style>
+</head>
+<body>
+<a href="home.html" class="logo">BudCart</a>
+<p class="tagline">Your one-stop shop for everything</p>
+
+<div class="card">
+  <h2>Welcome Back</h2>
+  <p class="sub">Sign in to your account to continue</p>
+  <div class="error-msg" id="error-msg"></div>
+  <div class="field">
+    <label>Username</label>
+    <input type="text" id="username" placeholder="Enter your username">
+  </div>
+  <div class="field">
+    <label>Password</label>
+    <input type="password" id="password" placeholder="Enter your password">
+  </div>
+  <button class="btn-primary" onclick="handleLogin()">Login</button>
+  <div class="divider"><span>New here?</span></div>
+  <div class="footer-link">Don't have an account? <a href="signup.html">Sign up</a></div>
+</div>
+
+<div id="toast"></div>
+<script>
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+function handleLogin() {
+  const user = document.getElementById('username').value.trim();
+  const pass = document.getElementById('password').value.trim();
+  const err  = document.getElementById('error-msg');
+  if (!user || !pass) {
+    err.textContent = 'Please fill in all fields.';
+    err.style.display = 'block'; return;
+  }
+  err.style.display = 'none';
+  showToast('Logging in…');
+  setTimeout(() => { window.location.href = 'home.html'; }, 800);
+}
+document.addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
+</script>
+</body>
+</html>

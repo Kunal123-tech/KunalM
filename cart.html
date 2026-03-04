@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BudCart — My Cart</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #111118;
+      --surface2: #18181f;
+      --border: #2a2a38;
+      --accent: #7c5cfc;
+      --accent2: #fc5c7d;
+      --success: #1fa564;
+      --danger: #e5404a;
+      --text: #e8e8f0;
+      --muted: #7a7a9a;
+      --white: #ffffff;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: rgba(10,10,15,.92);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    nav {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 28px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .logo {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 28px;
+      letter-spacing: 2px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-decoration: none;
+    }
+    .back-link {
+      margin-left: auto;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: color .2s;
+    }
+    .back-link:hover { color: var(--white); }
+
+    /* ── LAYOUT ── */
+    .page {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 40px 28px 80px;
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 28px;
+      align-items: start;
+    }
+
+    /* ── PAGE TITLE ── */
+    .page-title {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+      margin-bottom: 4px;
+    }
+    .page-title h1 {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 36px;
+      letter-spacing: 1px;
+      color: var(--white);
+    }
+    .item-count {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    /* ── CART ITEMS ── */
+    .cart-items {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .cart-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px;
+      display: flex;
+      gap: 18px;
+      align-items: flex-start;
+      transition: border-color .2s;
+    }
+    .cart-item:hover { border-color: rgba(124,92,252,.35); }
+
+    .item-img {
+      width: 88px;
+      height: 88px;
+      border-radius: 8px;
+      object-fit: cover;
+      flex-shrink: 0;
+      background: var(--surface2);
+    }
+
+    .item-details { flex: 1; min-width: 0; }
+    .item-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--white);
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .item-unit-price {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+
+    .qty-control {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      width: fit-content;
+    }
+    .qty-btn {
+      background: none;
+      border: none;
+      color: var(--text);
+      width: 36px;
+      height: 34px;
+      font-size: 17px;
+      cursor: pointer;
+      transition: background .15s, color .15s;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .qty-btn:hover { background: var(--border); color: var(--white); }
+    .qty-value {
+      width: 36px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--white);
+    }
+
+    .item-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+    .item-total {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--white);
+    }
+    .remove-btn {
+      background: none;
+      border: 1px solid transparent;
+      color: var(--muted);
+      font-size: 13px;
+      cursor: pointer;
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-family: inherit;
+      transition: color .2s, border-color .2s, background .2s;
+    }
+    .remove-btn:hover {
+      color: var(--danger);
+      border-color: var(--danger);
+      background: rgba(229,64,74,.08);
+    }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 80px 0;
+    }
+    .empty-icon { font-size: 72px; margin-bottom: 20px; }
+    .empty-state h2 {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 32px;
+      color: var(--white);
+      margin-bottom: 8px;
+    }
+    .empty-state p { color: var(--muted); margin-bottom: 28px; }
+    .shop-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, var(--accent), #5a3cd4);
+      color: #fff;
+      border: none;
+      padding: 13px 28px;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .shop-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(124,92,252,.4); }
+
+    /* ── ORDER SUMMARY ── */
+    .order-summary {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      position: sticky;
+      top: 84px;
+    }
+    .summary-title {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 22px;
+      letter-spacing: 1px;
+      color: var(--white);
+      margin-bottom: 20px;
+    }
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+    .summary-row:last-of-type { border-bottom: none; }
+    .summary-row .label { color: var(--muted); }
+    .summary-row .value { font-weight: 600; color: var(--white); }
+    .summary-total {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 16px 0 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+    .summary-total .label {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .summary-total .value {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 28px;
+      letter-spacing: 1px;
+      color: var(--white);
+    }
+
+    .checkout-btn {
+      width: 100%;
+      background: linear-gradient(135deg, var(--accent), #5a3cd4);
+      color: #fff;
+      border: none;
+      padding: 14px;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: .5px;
+      transition: opacity .2s, transform .15s, box-shadow .2s;
+    }
+    .checkout-btn:hover {
+      opacity: .9;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 28px rgba(124,92,252,.4);
+    }
+    .checkout-btn:active { transform: scale(.98); }
+    .checkout-btn:disabled { opacity: .4; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    .secure-note {
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 12px;
+    }
+
+    /* ── SUCCESS MODAL ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.75);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .3s;
+    }
+    .modal-overlay.visible {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 48px 40px;
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+      transform: scale(.9);
+      transition: transform .3s cubic-bezier(.22,1,.36,1);
+    }
+    .modal-overlay.visible .modal { transform: scale(1); }
+    .modal-icon { font-size: 64px; margin-bottom: 20px; }
+    .modal h2 {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 32px;
+      color: var(--white);
+      margin-bottom: 10px;
+    }
+    .modal p { color: var(--muted); font-size: 14px; line-height: 1.7; margin-bottom: 28px; }
+    .modal-close {
+      background: linear-gradient(135deg, var(--success), #0e8c52);
+      color: #fff;
+      border: none;
+      padding: 12px 28px;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <nav>
+    <a href="home.html" class="logo">BudCart</a>
+    <a href="home.html" class="back-link">← Continue Shopping</a>
+  </nav>
+</header>
+
+<div class="page" id="page-root">
+  <!-- Rendered by JS -->
+</div>
+
+<!-- Success Modal -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-icon">🎉</div>
+    <h2>Order Placed!</h2>
+    <p>Your order has been placed successfully.<br>We'll get it to you soon.</p>
+    <button class="modal-close" onclick="closeModal()">Back to Shopping</button>
+  </div>
+</div>
+
+<script>
+let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+function save() {
+  localStorage.setItem('cart', JSON.stringify(cart));
+}
+
+function increaseQty(i) {
+  cart[i].qty++;
+  cart[i].totalPrice += cart[i].price;
+  save(); render();
+}
+
+function decreaseQty(i) {
+  if (cart[i].qty > 1) {
+    cart[i].qty--;
+    cart[i].totalPrice -= cart[i].price;
+  } else {
+    cart.splice(i, 1);
+  }
+  save(); render();
+}
+
+function removeItem(i) {
+  cart.splice(i, 1);
+  save(); render();
+}
+
+function checkout() {
+  window.location.href = 'payment.html';
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('visible');
+  render();
+  window.location.href = 'home.html';
+}
+
+function render() {
+  const root = document.getElementById('page-root');
+  const total = cart.reduce((s, i) => s + i.totalPrice, 0);
+  const count = cart.reduce((s, i) => s + i.qty, 0);
+
+  if (cart.length === 0) {
+    root.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">🛒</div>
+        <h2>Your Cart is Empty</h2>
+        <p>Looks like you haven't added anything yet.</p>
+        <a href="home.html" class="shop-btn">Start Shopping →</a>
+      </div>
+    `;
+    return;
+  }
+
+  let itemsHTML = cart.map((item, i) => `
+    <div class="cart-item">
+      <img class="item-img" src="${item.img}" alt="${item.name}">
+      <div class="item-details">
+        <div class="item-name">${item.name}</div>
+        <div class="item-unit-price">$${item.price} per item</div>
+        <div class="qty-control">
+          <button class="qty-btn" onclick="decreaseQty(${i})">−</button>
+          <div class="qty-value">${item.qty}</div>
+          <button class="qty-btn" onclick="increaseQty(${i})">+</button>
+        </div>
+      </div>
+      <div class="item-right">
+        <div class="item-total">$${item.totalPrice}</div>
+        <button class="remove-btn" onclick="removeItem(${i})">🗑 Remove</button>
+      </div>
+    </div>
+  `).join('');
+
+  root.innerHTML = `
+    <div class="page-title">
+      <h1>My Cart</h1>
+      <span class="item-count">${count} item${count !== 1 ? 's' : ''}</span>
+    </div>
+    <div class="cart-items">${itemsHTML}</div>
+    <div class="order-summary">
+      <div class="summary-title">Order Summary</div>
+      <div class="summary-row"><span class="label">Subtotal (${count} items)</span><span class="value">$${total}</span></div>
+      <div class="summary-row"><span class="label">Shipping</span><span class="value" style="color:#1fa564">Free</span></div>
+      <div class="summary-row"><span class="label">Discount</span><span class="value" style="color:#fc5c7d">−$0</span></div>
+      <div class="summary-total">
+        <span class="label">Total</span>
+        <span class="value">$${total}</span>
+      </div>
+      <button class="checkout-btn" onclick="checkout()">Proceed to Checkout</button>
+      <p class="secure-note">🔒 Secure & encrypted checkout</p>
+    </div>
+  `;
+}
+
+render();
+</script>
+</body>
+</html>
